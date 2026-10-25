@@ -1,0 +1,29 @@
+# Local development secrets for `wrangler dev`.
+#
+#   cp apps/api/.dev.vars.example apps/api/.dev.vars
+#
+# .dev.vars is gitignored. Never put production values here.
+
+ENVIRONMENT=development
+ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+ENABLE_TRANSCRIPTION=true
+ENABLE_VISUAL_ANALYSIS=true
+ENABLE_SEMANTIC_SEARCH=true
+ENABLE_DEMO_MODE=true
+
+# Generate with: openssl rand -base64 48
+AUTH_SECRET=
+
+# Generate with: openssl rand -base64 32   (must decode to exactly 32 bytes)
+SECRETS_ENCRYPTION_KEY=
+
+# Optional. Any provider key you leave blank can instead be added per-user in
+# Settings → API Keys once the app is running.
+OPENAI_API_KEY=
+ANTHROPIC_API_KEY=
+GOOGLE_AI_API_KEY=
+ASSEMBLYAI_API_KEY=
+
+INSTAGRAM_APP_ID=
+INSTAGRAM_APP_SECRET=
+INSTAGRAM_REDIRECT_URI=http://localhost:8787/api/v1/integrations/instagram/callback

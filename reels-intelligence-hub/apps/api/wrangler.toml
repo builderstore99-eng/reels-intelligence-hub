@@ -1,0 +1,105 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "reels-intelligence-hub-api"
+main = "src/index.ts"
+compatibility_date = "2025-01-15"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = true
+
+# ---------------------------------------------------------------------------
+# Static assets
+#
+# The built frontend is uploaded with the Worker, so the app is served from the
+# same origin as the API: no CORS, no separate Pages project, and the HttpOnly
+# session cookie works as intended. Assets are matched first; anything that is
+# not a file (including /api/* and client-side routes) reaches the Worker, which
+# serves index.html for navigation requests.
+#
+# `npm run build:web` must run before `wrangler deploy` — the deploy script does
+# this for you. Running `wrangler deploy` directly on a clean clone fails with
+# "directory does not exist", which is the intended, loud failure.
+# ---------------------------------------------------------------------------
+[assets]
+directory = "../web/dist"
+binding = "ASSETS"
+
+# ---------------------------------------------------------------------------
+# Observability
+# ---------------------------------------------------------------------------
+[observability]
+enabled = true
+head_sampling_rate = 1
+
+# ---------------------------------------------------------------------------
+# Bindings
+#
+# Replace every REPLACE_WITH_* placeholder with the values printed by the
+# `wrangler` commands in DEPLOYMENT.md. These are resource identifiers, not
+# secrets, so they are safe to commit — but they are per-account, so a fresh
+# clone must run the setup commands before `wrangler deploy` will work.
+# ---------------------------------------------------------------------------
+
+[[d1_databases]]
+binding = "DB"
+database_name = "rih-db"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
+migrations_dir = "migrations"
+
+[[r2_buckets]]
+binding = "MEDIA"
+bucket_name = "rih-media"
+
+[[queues.producers]]
+binding = "PIPELINE"
+queue = "rih-pipeline"
+
+[[queues.consumers]]
+queue = "rih-pipeline"
+max_batch_size = 10
+max_batch_timeout = 5
+max_retries = 3
+dead_letter_queue = "rih-pipeline-dlq"
+
+[[vectorize]]
+binding = "VECTORS"
+index_name = "rih-embeddings"
+
+[ai]
+binding = "AI"
+
+# ---------------------------------------------------------------------------
+# Cron: nightly refresh of scheduled research (03:00 UTC daily).
+# The handler enqueues per-user scheduled jobs; it does not process content
+# itself, so a slow run can never exceed the CPU budget of the cron trigger.
+# ---------------------------------------------------------------------------
+[triggers]
+crons = ["0 3 * * *"]
+
+# ---------------------------------------------------------------------------
+# Non-secret variables. Secrets are set with `wrangler secret put` and are
+# never listed here.
+# ---------------------------------------------------------------------------
+[vars]
+ENVIRONMENT = "production"
+# Comma-separated list of origins allowed to call the API with credentials.
+ALLOWED_ORIGINS = "http://localhost:5173"
+# Feature switches. Set to "false" to disable a pipeline stage platform-wide.
+ENABLE_TRANSCRIPTION = "true"
+ENABLE_VISUAL_ANALYSIS = "true"
+ENABLE_SEMANTIC_SEARCH = "true"
+# Demo mode returns clearly-labelled synthetic records for local evaluation.
+# Keep this "false" in production.
+ENABLE_DEMO_MODE = "false"
+
+# ---------------------------------------------------------------------------
+# Local development
+# ---------------------------------------------------------------------------
+[env.dev]
+name = "reels-intelligence-hub-api-dev"
+
+[env.dev.vars]
+ENVIRONMENT = "development"
+ALLOWED_ORIGINS = "http://localhost:5173,http://127.0.0.1:5173"
+ENABLE_TRANSCRIPTION = "true"
+ENABLE_VISUAL_ANALYSIS = "true"
+ENABLE_SEMANTIC_SEARCH = "true"
+ENABLE_DEMO_MODE = "true"

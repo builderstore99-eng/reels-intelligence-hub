@@ -1,0 +1,202 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens.
+ *
+ * The palette is deliberately narrow: one accent, one warm highlight, and a
+ * seven-step charcoal ramp. Every colour, radius and shadow used anywhere in
+ * the app resolves through one of these variables, so a theme change is a
+ * one-file edit.
+ */
+@theme {
+  --color-ink-950: #08090c;
+  --color-ink-900: #0b0d12;
+  --color-ink-850: #0e1116;
+  --color-ink-800: #12151c;
+  --color-ink-750: #171b24;
+  --color-ink-700: #1d222d;
+  --color-ink-600: #2a3140;
+  --color-ink-500: #3b4456;
+  --color-ink-400: #5b6579;
+  --color-ink-300: #8b95a8;
+  --color-ink-200: #b8c0cf;
+  --color-ink-100: #e2e6ee;
+
+  --color-accent-50: #eef6ff;
+  --color-accent-200: #b9d8ff;
+  --color-accent-400: #6aa9f7;
+  --color-accent-500: #3d8bf0;
+  --color-accent-600: #2f74d0;
+
+  --color-warm-400: #f0b26a;
+  --color-warm-500: #e09a45;
+
+  --color-success-500: #46b17b;
+  --color-warning-500: #d9a13b;
+  --color-danger-500: #e06464;
+  --color-info-500: #5aa9e6;
+
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+}
+
+/* Light theme overrides. Applied by toggling `data-theme` on <html>. */
+:root[data-theme='light'] {
+  --color-ink-950: #f6f7f9;
+  --color-ink-900: #ffffff;
+  --color-ink-850: #fbfbfd;
+  --color-ink-800: #f2f3f6;
+  --color-ink-750: #eaecf1;
+  --color-ink-700: #dfe2e9;
+  --color-ink-600: #c8cdd8;
+  --color-ink-500: #a7aebd;
+  --color-ink-400: #7c8698;
+  --color-ink-300: #5c6679;
+  --color-ink-200: #3f4859;
+  --color-ink-100: #1c2230;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-ink-700);
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--color-ink-950);
+    color: var(--color-ink-100);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--color-accent-500) 35%, transparent);
+  }
+
+  /* A quiet, consistent scrollbar. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-ink-600) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: var(--color-ink-600);
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent-500);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+}
+
+@layer components {
+  .surface {
+    background-color: var(--color-ink-900);
+    border: 1px solid var(--color-ink-700);
+    border-radius: var(--radius-lg);
+  }
+
+  .surface-raised {
+    background-color: var(--color-ink-850);
+    border: 1px solid var(--color-ink-700);
+    border-radius: var(--radius-lg);
+    box-shadow:
+      0 1px 0 0 rgb(255 255 255 / 0.03) inset,
+      0 18px 40px -28px rgb(0 0 0 / 0.9);
+  }
+
+  .surface-hover {
+    transition:
+      border-color 160ms ease,
+      background-color 160ms ease,
+      transform 160ms ease;
+  }
+  .surface-hover:hover {
+    border-color: var(--color-ink-600);
+    background-color: var(--color-ink-850);
+  }
+
+  .hairline {
+    border-color: var(--color-ink-700);
+  }
+
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      var(--color-ink-800) 25%,
+      var(--color-ink-750) 37%,
+      var(--color-ink-800) 63%
+    );
+    background-size: 400% 100%;
+    animation: shimmer 1.4s ease-in-out infinite;
+    border-radius: var(--radius-sm);
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0 50%;
+    }
+  }
+
+  .fade-in {
+    animation: fade-in 220ms ease both;
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .prose-report h2 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin: 1.5rem 0 0.5rem;
+    color: var(--color-ink-100);
+  }
+  .prose-report p {
+    margin: 0.5rem 0;
+    line-height: 1.7;
+    color: var(--color-ink-200);
+  }
+  .prose-report li {
+    margin: 0.25rem 0 0.25rem 1.1rem;
+    list-style: disc;
+    color: var(--color-ink-200);
+  }
+}

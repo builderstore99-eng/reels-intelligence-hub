@@ -1,0 +1,41 @@
+{
+  "name": "reels-intelligence-hub",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI-powered Instagram research and knowledge platform built on Cloudflare.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace @rih/web",
+    "dev:api": "npm run dev --workspace @rih/api",
+    "build": "npm run build --workspace @rih/web && npm run build --workspace @rih/api",
+    "build:web": "npm run build --workspace @rih/web",
+    "build:api": "npm run build --workspace @rih/api",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "eslint . --max-warnings=0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "db:migrate:local": "npm run db:migrate:local --workspace @rih/api",
+    "db:migrate:remote": "npm run db:migrate:remote --workspace @rih/api",
+    "deploy": "npm run build:web && npm run typecheck --workspace @rih/api && wrangler deploy --config apps/api/wrangler.toml",
+    "setup": "bash scripts/provision-cloudflare.sh",
+    "deploy:dry-run": "npm run build:web && npm run typecheck --workspace @rih/api && wrangler deploy --dry-run --outdir apps/api/dist --config apps/api/wrangler.toml",
+    "bundle:paste": "node scripts/bundle-for-dashboard.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "eslint": "^9.18.0",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.20.0",
+    "vitest": "^3.0.0"
+  }
+}
